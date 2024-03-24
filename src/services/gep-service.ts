@@ -37,7 +37,7 @@ export class GEPService extends EventEmitter {
 
       const fileName =
         GameFileName[this.gameLaunchId as keyof typeof GameFileName];
-      const response = await fetch(`${environment.url}/writeToFile`, {
+      const response = await fetch(`${environment.url}/game-data/write`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

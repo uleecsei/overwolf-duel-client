@@ -1,3 +1,5 @@
 node_modules/
 /test-reports/
 coverage/
+.git-credentials
+.DS_Store

@@ -14,10 +14,10 @@ import { AuthService } from './services/auth-service';
 // -----------------------------------------------------------------------------
 @injectable()
 export class Main {
-  loginButton = document.getElementById('discord-button');
-  continueButton = document.getElementById('continue-button');
-  userGreeting = document.getElementById('userGreeting');
-  getDataButton = document.getElementById('get-data-button');
+  // loginButton = document.getElementById('discord-button');
+  // continueButton = document.getElementById('continue-button');
+  // userGreeting = document.getElementById('userGreeting');
+  // getDataButton = document.getElementById('get-data-button');
 
   server: any;
 
@@ -27,45 +27,34 @@ export class Main {
     private readonly gameDetectionService: GameDetectionService,
     private readonly authService: AuthService,
   ) {
-    this.loginButton?.addEventListener('click', () => {
-      this.authService.login();
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.loginButton?.style.display = 'none';
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.continueButton?.style.display = 'block';
-    });
-    this.continueButton?.addEventListener('click', () => {
-      this.onContinue();
-    });
+    this.init();
   }
 
-  async onContinue(): Promise<void> {
-    const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) {
-      return;
-    }
-
-    this.authService.getUser(sessionId).then((data) => {
-      const user = data.user;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.continueButton?.style.display = 'none';
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      // eslint-disable-next-line max-len
-      this.userGreeting?.innerText = `Hi, ${user.username}. Enjoy playing games.`;
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      // @ts-ignore
-      this.getDataButton?.style.display = 'block';
-      this.init();
-    });
-
-    this.authService.getConnections(sessionId).then((data) => {
-      console.log(data);
-    });
-  }
+  // async onContinue(): Promise<void> {
+  //   const sessionId = localStorage.getItem('sessionId');
+  //   if (!sessionId) {
+  //     return;
+  //   }
+  //
+  //   this.authService.getUser(sessionId).then((data) => {
+  //     const user = data.user;
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     this.continueButton?.style.display = 'none';
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     // eslint-disable-next-line max-len
+  //     this.userGreeting?.innerText = `Hi, ${user.username}. Enjoy playing games.`;
+  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  //     // @ts-ignore
+  //     this.getDataButton?.style.display = 'block';
+  //     this.init();
+  //   });
+  //
+  //   this.authService.getConnections(sessionId).then((data) => {
+  //     console.log(data);
+  //   });
+  // }
 
   /**
    * Initializes this app

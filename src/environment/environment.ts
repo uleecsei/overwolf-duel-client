@@ -1,6 +1,6 @@
 // use http://localhost:3000 for dev mode
-// use https://overwolf-duel-api-207077dd4a09.herokuapp.com for prod
+// use http://103.241.65.202:3000 for prod
 
 export const environment = {
-  url: 'http://localhost:3000',
+  url: 'http://103.241.65.202:3000',
 };
