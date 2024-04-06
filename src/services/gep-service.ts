@@ -30,6 +30,7 @@ export class GEPService extends EventEmitter {
 
   async saveToDataBase() {
     try {
+      console.log('save to database');
       const sessionId = localStorage.getItem('sessionId');
       if (!sessionId) {
         return;
@@ -197,6 +198,7 @@ export class GEPService extends EventEmitter {
         name: matchEndEvent.name,
         data: { date: new Date() },
       });
+      console.log('calling save function', matchEndEvent);
       this.saveToDataBase();
     }
   }
