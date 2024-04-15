@@ -29,12 +29,8 @@ export class GEPService extends EventEmitter {
    */
 
   async saveToDataBase() {
+    console.log('saveToDataBase worked');
     try {
-      const sessionId = localStorage.getItem('sessionId');
-      if (!sessionId) {
-        return;
-      }
-
       const fileName =
         GameFileName[this.gameLaunchId as keyof typeof GameFileName];
       const response = await fetch(`${environment.url}/game-data/write`, {
@@ -48,7 +44,6 @@ export class GEPService extends EventEmitter {
             info: this.info,
             fileName: fileName || null,
           },
-          sessionId,
         }),
       });
       this.events = [];
@@ -539,7 +534,9 @@ export class GEPService extends EventEmitter {
     const matchEndEvent = event.events.find(
       (item) => item.name === 'match_end',
     );
+    console.log(matchEndEvent, 'match_end event log!');
     if (matchEndEvent && (this.info.length || this.events.length)) {
+      console.log('CS2 match_end event worked');
       this.events.push({
         name: matchEndEvent.name,
         data: { date: new Date() },
