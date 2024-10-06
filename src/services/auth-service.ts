@@ -32,12 +32,18 @@ export class AuthService {
 
   constructor() {}
 
-  async getUser(sessionId: string): Promise<any> {
+  async getUser(): Promise<any> {
     try {
+      const token = localStorage.getItem('token');
+
       const response = await fetch(
-        environment.url + `/auth/discord/user?sessionId=${sessionId}`,
+        environment.url + `/auth/user`,
         {
           method: 'GET',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         },
       );
 

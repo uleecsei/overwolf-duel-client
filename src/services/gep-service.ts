@@ -30,6 +30,8 @@ export class GEPService extends EventEmitter {
 
   async saveToDataBase() {
     console.log('saveToDataBase worked');
+
+    const token = localStorage.getItem('token');
     try {
       const fileName =
         GameFileName[this.gameLaunchId as keyof typeof GameFileName];
@@ -37,6 +39,8 @@ export class GEPService extends EventEmitter {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': `Bearer ${token}`,
         },
         body: JSON.stringify({
           data: {

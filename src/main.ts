@@ -10,51 +10,120 @@ import {
 } from './interfaces/running-game';
 import { GEPConsumer } from './services/gep-consumer';
 import { AuthService } from './services/auth-service';
+import { environment } from "./environment/environment";
 
 // -----------------------------------------------------------------------------
 @injectable()
 export class Main {
-  // loginButton = document.getElementById('discord-button');
-  // continueButton = document.getElementById('continue-button');
-  // userGreeting = document.getElementById('userGreeting');
-  // getDataButton = document.getElementById('get-data-button');
-
   server: any;
+  port = 61234;
+  userData: any;
 
   public constructor(
-    private readonly gepService: GEPService,
-    private readonly gepConsumer: GEPConsumer,
-    private readonly gameDetectionService: GameDetectionService,
-    private readonly authService: AuthService,
+      private readonly gepService: GEPService,
+      private readonly gepConsumer: GEPConsumer,
+      private readonly gameDetectionService: GameDetectionService,
+      private readonly authService: AuthService,
   ) {
-    this.init();
+    this.createServer();
+    this.checkTokenAndUser();
   }
 
-  // async onContinue(): Promise<void> {
-  //   const sessionId = localStorage.getItem('sessionId');
-  //   if (!sessionId) {
-  //     return;
-  //   }
-  //
-  //   this.authService.getUser(sessionId).then((data) => {
-  //     const user = data.user;
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     this.continueButton?.style.display = 'none';
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     // eslint-disable-next-line max-len
-  //     this.userGreeting?.innerText = `Hi, ${user.username}. Enjoy playing games.`;
-  //     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  //     // @ts-ignore
-  //     this.getDataButton?.style.display = 'block';
-  //     this.init();
-  //   });
-  //
-  //   this.authService.getConnections(sessionId).then((data) => {
-  //     console.log(data);
-  //   });
-  // }
+  checkTokenAndUser(): void {
+    const token = localStorage.getItem('token');
+    if (token) {
+      this.authService.getUser()
+          .then((userData) => {
+            this.userData = userData;
+            this.displayUserInfo();
+            this.init();
+          })
+          .catch((error) => {
+            console.error('Error fetching user data:', error);
+            this.displayAuthButtons();
+          });
+    } else {
+      this.displayAuthButtons();  // No token, show login/register
+    }
+  }
+
+  createServer(): void {
+    overwolf.web.createServer(this.port, (serverInfo) => {
+      if (serverInfo.error) {
+        console.log('Failed to create local server');
+      } else {
+        this.server = serverInfo.server;
+
+        if (!this.server) {
+          return;
+        }
+
+        this.server.onRequest.removeListener(this.onRequest.bind(this));
+        this.server.onRequest.addListener(this.onRequest.bind(this));
+
+        this.server.listen(() => {
+          console.log(`Local server listening on port ${this.port}`);
+        });
+      }
+    });
+  }
+
+  onRequest(info: { url: string }) {
+    const urlString = info.url;
+    const url = new URL(urlString);
+    const searchParams = url.searchParams;
+
+    const token = searchParams.get('token');
+
+    if (token) {
+      localStorage.setItem('token', token);
+
+      this.authService.getUser()
+          .then((userData) => {
+            this.userData = userData;
+            this.displayUserInfo();
+            this.init();
+          })
+          .catch((error) => {
+            console.error('Error fetching user data:', error);
+          });
+    }
+  }
+
+  displayUserInfo(): void {
+    const container = document.querySelector('.center-container');
+    if (container) {
+      container.innerHTML = `
+        <div>
+          Enjoy playing games!<br />
+          User Data:
+          <pre>${this.userData?.user?.discordData?.username}</pre>
+        </div>
+      `;
+    }
+  }
+
+  displayAuthButtons(): void {
+    const callbackUrl = `http://localhost:${this.port}`;
+    const loginUrl = `${environment.url}/login/?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+    const registerUrl = `${environment.url}/register/?callbackUrl=${encodeURIComponent(callbackUrl)}`;
+
+    const container = document.querySelector('.center-container');
+    if (container) {
+      container.innerHTML = `
+        <button id="login-button" class="btn">Login</button>
+        <button id="register-button" class="btn">Register</button>
+      `;
+
+      document.getElementById('login-button')?.addEventListener('click', () => {
+        overwolf.utils.openUrlInDefaultBrowser(loginUrl);
+      });
+
+      document.getElementById('register-button')?.addEventListener('click', () => {
+        overwolf.utils.openUrlInDefaultBrowser(registerUrl);
+      });
+    }
+  }
 
   /**
    * Initializes this app
